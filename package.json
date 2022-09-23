@@ -7,7 +7,8 @@
   },
   "scripts": {
     "build": "webpack",
-    "start": "webpack serve"
+    "start": "webpack serve",
+    "server": "json-server -w db.json"
   },
   "devDependencies": {
     "json-server": "^0.17.0",
