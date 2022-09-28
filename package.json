@@ -8,9 +8,14 @@
   "scripts": {
     "build": "webpack",
     "start": "webpack serve",
-    "server": "json-server -w db.json"
+    "server": "json-server -w db.json",
+    "test": "jest"
   },
   "devDependencies": {
+    "@types/jest": "^24.0.21",
+    "jasmine-marbles": "^0.9.2",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.1.0",
     "json-server": "^0.17.0",
     "ts-loader": "^8.0.17",
     "typescript": "^4.1.5",
