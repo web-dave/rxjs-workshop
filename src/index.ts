@@ -11,6 +11,7 @@ import {
   debounceTime,
 } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
+import { userFilterPipe } from './userFilter.pipe';
 
 const btn = document.querySelector('button');
 const input = document.querySelector('input');
@@ -63,25 +64,26 @@ const input$ = fromEvent(input, 'input');
 // concatMap
 // exhaustMap
 // switchMap
-const call$ = input$.pipe(
-  map((e: Event) => (e.target as HTMLInputElement).value),
-  debounceTime(300),
-  // alle requests werden nach einander ausgelöst evtl auch parallel
-  // mergeMap((data) =>
-  //   ajax.getJSON<any[]>('http://localhost:3000/users?first_name_like=' + data)
-  // ),
-  // concatiniert alle requests
-  // concatMap((data) =>
-  //   ajax.getJSON<any[]>('http://localhost:3000/users?first_name_like=' + data)
-  // ),
-  tap(console.log),
-  // Ignoriert neue events solange innerer nicht completed ist
-  // exhaustMap((data) =>
-  //   ajax.getJSON<any[]>('http://localhost:3000/users?first_name_like=' + data)
-  // )
-  // cancelt request bei neuem event
-  switchMap((data) =>
-    ajax.getJSON<any[]>('http://localhost:3000/users?first_name_like=' + data)
-  )
-);
+// const call$ = input$.pipe(
+//   map((e: Event) => (e.target as HTMLInputElement).value),
+//   debounceTime(300),
+//   // alle requests werden nach einander ausgelöst evtl auch parallel
+//   // mergeMap((data) =>
+//   //   ajax.getJSON<any[]>('http://localhost:3000/users?first_name_like=' + data)
+//   // ),
+//   // concatiniert alle requests
+//   // concatMap((data) =>
+//   //   ajax.getJSON<any[]>('http://localhost:3000/users?first_name_like=' + data)
+//   // ),
+//   tap(console.log),
+//   // Ignoriert neue events solange innerer nicht completed ist
+//   // exhaustMap((data) =>
+//   //   ajax.getJSON<any[]>('http://localhost:3000/users?first_name_like=' + data)
+//   // )
+//   // cancelt request bei neuem event
+//   switchMap((data) =>
+//     ajax.getJSON<any[]>('http://localhost:3000/users?first_name_like=' + data)
+//   )
+// );
+const call$ = input$.pipe(userFilterPipe());
 call$.subscribe();
