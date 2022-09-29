@@ -9,6 +9,9 @@ import {
   exhaustMap,
   switchMap,
   debounceTime,
+  retry,
+  catchError,
+  of,
 } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 import { userFilterPipe } from './userFilter.pipe';
@@ -85,5 +88,8 @@ const input$ = fromEvent(input, 'input');
 //     ajax.getJSON<any[]>('http://localhost:3000/users?first_name_like=' + data)
 //   )
 // );
-const call$ = input$.pipe(userFilterPipe<any[]>());
-call$.subscribe();
+const call$ = input$.pipe(
+  userFilterPipe<any[]>(),
+  catchError((err) => of([]))
+);
+call$.subscribe(console.log);
