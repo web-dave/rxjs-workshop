@@ -85,5 +85,5 @@ const input$ = fromEvent(input, 'input');
 //     ajax.getJSON<any[]>('http://localhost:3000/users?first_name_like=' + data)
 //   )
 // );
-const call$ = input$.pipe(userFilterPipe());
+const call$ = input$.pipe(userFilterPipe<any[]>());
 call$.subscribe();
