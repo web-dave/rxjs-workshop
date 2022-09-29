@@ -39,6 +39,7 @@ const mockData = [
   },
 ];
 
+// Hint
 describe('mapArrayMap', () => {
   it('should sort the numeric items of the array with predicate', () => {
     const actual = of([5, 4, 3, 2, 1]).pipe(map((data) => data.sort()));
