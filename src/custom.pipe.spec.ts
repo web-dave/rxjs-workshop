@@ -1,5 +1,8 @@
 import { of, map } from 'rxjs';
 import { cold } from 'jasmine-marbles';
+import { userFilterPipe } from './userFilter.pipe';
+import { ajax } from 'rxjs/ajax';
+
 const mockData = [
   {
     id: 1,
@@ -44,6 +47,19 @@ describe('mapArrayMap', () => {
   it('should sort the numeric items of the array with predicate', () => {
     const actual = of([5, 4, 3, 2, 1]).pipe(map((data) => data.sort()));
     const expected = cold('(a|)', { a: [1, 2, 3, 4, 5] });
+    expect(actual).toBeObservable(expected);
+  });
+});
+describe('UserFilter', () => {
+  it('should get Users', () => {
+    spyOn(ajax, 'getJSON').and.returnValue(of([mockData[0]]));
+    const target: HTMLInputElement = document.createElement('input');
+    target.value = '1';
+
+    const actual = of({ ...new Event('input'), target } as Event).pipe(
+      userFilterPipe<any>()
+    );
+    const expected = cold('(a|)', { a: [mockData[0]] });
     expect(actual).toBeObservable(expected);
   });
 });
