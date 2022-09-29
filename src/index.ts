@@ -12,6 +12,8 @@ import {
   retry,
   catchError,
   of,
+  BehaviorSubject,
+  ReplaySubject,
 } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 import { userFilterPipe } from './userFilter.pipe';
@@ -88,8 +90,24 @@ const input$ = fromEvent(input, 'input');
 //     ajax.getJSON<any[]>('http://localhost:3000/users?first_name_like=' + data)
 //   )
 // );
+
+// ---------------------------------
 const call$ = input$.pipe(
   userFilterPipe<any[]>(),
   catchError((err) => of([]))
 );
 call$.subscribe(console.log);
+
+// -------------------------------
+
+// const buzz$$ = new BehaviorSubject(1);
+const buzz$$ = new ReplaySubject(3);
+buzz$$.next(4);
+buzz$$.next(4);
+buzz$$.next(4);
+buzz$$.next(4);
+// buzz$$.error('Help');
+buzz$$.complete();
+buzz$$.subscribe({ next: (data) => print(data.toString()) });
+buzz$$.next(5);
+const foo = buzz$$.asObservable();

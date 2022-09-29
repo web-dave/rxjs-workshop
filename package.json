@@ -9,7 +9,7 @@
     "build": "webpack",
     "start": "webpack serve",
     "server": "json-server -w db.json",
-    "test": "jest --watch"
+    "test": "jest"
   },
   "devDependencies": {
     "@types/jest": "^24.0.21",
