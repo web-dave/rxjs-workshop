@@ -1,4 +1,4 @@
-import { fromEvent, map, pairwise, pluck } from 'rxjs';
+import { fromEvent, map, pairwise, pluck, take } from 'rxjs';
 
 const btn = document.querySelector('button');
 const output: HTMLUListElement = document.querySelector('ul');
@@ -29,6 +29,7 @@ btn$.subscribe({ next: (data) => console.log('BTN', data) });
 btn$
   .pipe(
     map((data) => data.timeStamp),
+    take(7),
     pairwise(),
     map(([prev, curr]) => curr - prev),
     map((data) => data.toString())
