@@ -8,6 +8,7 @@ import {
   mergeMap,
   take,
   tap,
+  pipe,
 } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 
@@ -49,15 +50,18 @@ const btn$ = fromEvent(btn, 'click');
 //     map(data => data.toString())
 //     )
 //   .subscribe((data) => print(data));
-btn$
-  .pipe(
-    map((data) => data.timeStamp),
+
+function timeGoneBye() {
+  return pipe(
+    map((data: any) => data.timeStamp),
     take(7),
     pairwise(),
     map(([prev, curr]) => curr - prev),
     map((data) => data.toString())
-  )
-  .subscribe((data) => print(data));
+  );
+}
+
+btn$.pipe(timeGoneBye()).subscribe((data) => print(data));
 
 const input = document.querySelector('input');
 const input$ = fromEvent(input, 'input');
