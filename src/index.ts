@@ -9,6 +9,9 @@ import {
   take,
   tap,
   pipe,
+  retry,
+  catchError,
+  of,
 } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 
@@ -74,8 +77,22 @@ input$
         'http://localhost:3000/users?last_name_like=' + data
       ).pipe(
         tap(console.log),
-        map((data) => data.response.map((u) => u['last_name']))
+        map((data) => data.response.map((u) => u['last_name'])),
+        retry({ delay: 1500, resetOnSuccess: true, count: 3 }),
+        catchError((err) => of(['Hallo', 'Schaeffler']))
       )
     )
   )
   .subscribe({ next: (data) => print2(data) });
+
+// error Handling
+const users$ = ajax<{ [key: string]: string }[]>(
+  'http://localhost:3000/user'
+).pipe(map((response) => response.response));
+
+users$
+  .pipe(
+    retry({ delay: 1500, resetOnSuccess: true, count: 3 }),
+    catchError((err) => of(['Hallo', 'Schaeffler']))
+  )
+  .subscribe({ next: (data) => console.log(data) });
