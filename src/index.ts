@@ -1,4 +1,4 @@
-import { fromEvent } from 'rxjs';
+import { fromEvent, map } from 'rxjs';
 
 const btn = document.querySelector('button');
 const output: HTMLUListElement = document.querySelector('ul');
@@ -20,7 +20,9 @@ const myObservable = {
 const btn$ = fromEvent(btn, 'click');
 
 btn$.subscribe({ next: (data) => console.log('BTN', data) });
-btn$.subscribe((data) => console.log('BTN', data));
+btn$
+  .pipe(map((data) => data.timeStamp.toString()))
+  .subscribe((data) => print(data));
 
 // myObservable.subscribe({
 //   next: (data) => console.log('next', data),
