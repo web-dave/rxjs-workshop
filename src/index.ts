@@ -30,7 +30,7 @@ btn$
   .pipe(
     map((data) => data.timeStamp),
     pairwise(),
-    map(([acc, curr]) => curr - acc),
+    map(([prev, curr]) => curr - prev),
     map((data) => data.toString())
   )
   .subscribe((data) => print(data));
