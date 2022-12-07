@@ -20,6 +20,12 @@ import { ajax } from 'rxjs/ajax';
 
 import { WebSocketSubject } from 'rxjs/webSocket';
 
+export const getValueAndDelay = () =>
+  pipe(
+    map((data: Event) => (data.target as HTMLInputElement).value),
+    debounceTime(300)
+  );
+
 const btn = document.querySelector('button');
 const output: HTMLUListElement = document.querySelector('ul');
 
@@ -93,11 +99,7 @@ filter$$
     })
   )
   .subscribe((data) => console.log(data));
-const getValueAndDelay = () =>
-  pipe(
-    map((data: Event) => (data.target as HTMLInputElement).value),
-    debounceTime(300)
-  );
+
 input$
   .pipe(
     getValueAndDelay(),

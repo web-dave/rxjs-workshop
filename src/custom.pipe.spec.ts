@@ -1,5 +1,11 @@
-import { of, map } from 'rxjs';
+import { of, map, debounceTime, pipe } from 'rxjs';
 import { cold } from 'jasmine-marbles';
+export const getValueAndDelay = () =>
+  pipe(
+    map((data: Event) => (data.target as HTMLInputElement).value),
+    debounceTime(300)
+  );
+
 const mockData = [
   {
     id: 1,
@@ -44,6 +50,13 @@ describe('mapArrayMap', () => {
   it('should sort the numeric items of the array with predicate', () => {
     const actual = of([5, 4, 3, 2, 1]).pipe(map((data) => data.sort()));
     const expected = cold('(a|)', { a: [1, 2, 3, 4, 5] });
+    expect(actual).toBeObservable(expected);
+  });
+});
+describe('getValueAndDelay', () => {
+  it('wait 300ms and emit', () => {
+    const actual = of({ target: { value: 7 } } as any).pipe(getValueAndDelay());
+    const expected = cold('(a|)', { a: 7 });
     expect(actual).toBeObservable(expected);
   });
 });
