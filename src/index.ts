@@ -10,3 +10,14 @@ function print(text: string) {
 }
 
 // coding start here
+const myObservable = {
+  observer: null,
+  subscribe: (observer: any) => {
+    myObservable.observer = observer;
+    setInterval(() => myObservable.observer.next('Hello'), 1500);
+  },
+};
+
+myObservable.subscribe({
+  next: (data) => console.log('next', data),
+});
