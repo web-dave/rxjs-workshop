@@ -1,4 +1,4 @@
-import {} from 'rxjs';
+import { fromEvent } from 'rxjs';
 
 const btn = document.querySelector('button');
 const output: HTMLUListElement = document.querySelector('ul');
@@ -17,7 +17,11 @@ const myObservable = {
     setInterval(() => myObservable.observer.next('Hello'), 1500);
   },
 };
+const btn$ = fromEvent(btn, 'click');
 
-myObservable.subscribe({
-  next: (data) => console.log('next', data),
-});
+btn$.subscribe({ next: (data) => console.log('BTN', data) });
+btn$.subscribe((data) => console.log('BTN', data));
+
+// myObservable.subscribe({
+//   next: (data) => console.log('next', data),
+// });
