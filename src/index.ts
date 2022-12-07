@@ -1,4 +1,15 @@
-import { fromEvent, map, pairwise, pluck, take } from 'rxjs';
+import {
+  fromEvent,
+  map,
+  pairwise,
+  switchMap,
+  concatMap,
+  exhaustMap,
+  mergeMap,
+  take,
+  tap,
+} from 'rxjs';
+import { ajax } from 'rxjs/ajax';
 
 const btn = document.querySelector('button');
 const output: HTMLUListElement = document.querySelector('ul');
@@ -9,6 +20,15 @@ function print(text: string) {
   output.appendChild(li);
 }
 
+function print2(text: string[]) {
+  output.innerHTML = '';
+  text.forEach((t) => {
+    const li: HTMLLIElement = document.createElement('li');
+    li.innerText = t;
+    output.appendChild(li);
+  });
+}
+
 // coding start here
 const myObservable = {
   observer: null,
@@ -17,9 +37,12 @@ const myObservable = {
     setInterval(() => myObservable.observer.next('Hello'), 1500);
   },
 };
+// myObservable.subscribe({
+//   next: (data) => console.log('next', data),
+// });
 const btn$ = fromEvent(btn, 'click');
 
-btn$.subscribe({ next: (data) => console.log('BTN', data) });
+// btn$.subscribe({ next: (data) => console.log('BTN', data) });
 // btn$
 //   .pipe(
 //     pluck('timeStamp'),
@@ -36,6 +59,19 @@ btn$
   )
   .subscribe((data) => print(data));
 
-// myObservable.subscribe({
-//   next: (data) => console.log('next', data),
-// });
+const input = document.querySelector('input');
+const input$ = fromEvent(input, 'input');
+
+input$
+  .pipe(
+    map((data) => (data.target as HTMLInputElement).value),
+    switchMap((data) =>
+      ajax<{ [key: string]: string }[]>(
+        'http://localhost:3000/users?last_name_like=' + data
+      ).pipe(
+        tap(console.log),
+        map((data) => data.response.map((u) => u['last_name']))
+      )
+    )
+  )
+  .subscribe({ next: (data) => print2(data) });
