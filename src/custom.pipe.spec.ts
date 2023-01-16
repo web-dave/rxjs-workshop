@@ -1,4 +1,4 @@
-import { of, map, debounceTime, pipe } from 'rxjs';
+import { of, map, debounceTime, pipe, from } from 'rxjs';
 import { cold } from 'jasmine-marbles';
 export const getValueAndDelay = () =>
   pipe(
@@ -55,7 +55,9 @@ describe('mapArrayMap', () => {
 });
 describe('getValueAndDelay', () => {
   it('wait 300ms and emit', () => {
-    const actual = of({ target: { value: 7 } } as any).pipe(getValueAndDelay());
+    const actual = of({ target: { value: 7 } } as any, {
+      target: { value: 7 },
+    }).pipe(getValueAndDelay());
     const expected = cold('(a|)', { a: 7 });
     expect(actual).toBeObservable(expected);
   });
