@@ -1,4 +1,4 @@
-import { fromEvent, map, Subscription } from 'rxjs';
+import { fromEvent, map, pairwise, Subscription, take } from 'rxjs';
 
 const btn = document.querySelector('button');
 const output: HTMLUListElement = document.querySelector('ul');
@@ -12,9 +12,16 @@ function print(text: string) {
 // coding start here
 const event$ = fromEvent(btn, 'click');
 
-const sub: Subscription = event$
-  .pipe(map((data) => data.timeStamp))
-  .subscribe((data) => print(data.toString()));
+const timeStamp$ = event$.pipe(map((data) => data.timeStamp));
+
+const timeDiff$ = timeStamp$.pipe(
+  pairwise(),
+  map(([curr, prev]) => prev - curr)
+);
+
+const event7$ = timeDiff$.pipe(take(7));
+
+const sub: Subscription = event7$.subscribe((data) => print(data.toString()));
 
 setTimeout(() => {
   sub.unsubscribe();
