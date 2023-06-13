@@ -1,4 +1,4 @@
-import { fromEvent } from 'rxjs';
+import { fromEvent, map, tap } from 'rxjs';
 
 const btn = document.querySelector('button');
 const output: HTMLUListElement = document.querySelector('ul');
@@ -12,9 +12,23 @@ function print(text: string) {
 
 const buttonObservable$ = fromEvent(btn, 'click');
 
-buttonObservable$.subscribe({
-  next: (data) => print('Hallo Schaeffler!'),
-});
+// buttonObservable$.subscribe();
+
+buttonObservable$
+  .pipe(
+    tap((data) => console.log(data)),
+    map((data) => data.timeStamp),
+    tap((data) => console.log(data)),
+    map((hurz) => hurz.toString()),
+    tap((data) => console.log(data))
+  )
+  .subscribe({
+    next: (data) => {
+      print(data);
+    },
+  });
+
+// buttonObservable$.subscribe((data) => console.log(data));
 
 // const myObservable = {
 //   observer: null,
