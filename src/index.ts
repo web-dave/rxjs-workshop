@@ -1,4 +1,4 @@
-import { fromEvent, map, pairwise, tap } from 'rxjs';
+import { fromEvent, map, pairwise, take, tap } from 'rxjs';
 
 const btn = document.querySelector('button');
 const output: HTMLUListElement = document.querySelector('ul');
@@ -14,8 +14,9 @@ const buttonObservable$ = fromEvent(btn, 'click');
 
 // buttonObservable$.subscribe();
 
-buttonObservable$
+const sub = buttonObservable$
   .pipe(
+    take(7),
     tap((data) => console.log(data)),
     map((data) => data.timeStamp),
     pairwise(),
@@ -29,8 +30,11 @@ buttonObservable$
     next: (data) => {
       print(data);
     },
+    complete: () => print('Ich habe fertig'),
   });
-
+setInterval(() => {
+  console.log(sub.closed);
+}, 1500);
 // buttonObservable$.subscribe((data) => console.log(data));
 
 // const myObservable = {
