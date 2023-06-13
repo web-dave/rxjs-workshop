@@ -1,4 +1,4 @@
-import { fromEvent, map, tap } from 'rxjs';
+import { fromEvent, map, pairwise, tap } from 'rxjs';
 
 const btn = document.querySelector('button');
 const output: HTMLUListElement = document.querySelector('ul');
@@ -18,6 +18,9 @@ buttonObservable$
   .pipe(
     tap((data) => console.log(data)),
     map((data) => data.timeStamp),
+    pairwise(),
+    tap((data) => console.log(data)),
+    map((data) => data[1] - data[0]),
     tap((data) => console.log(data)),
     map((hurz) => hurz.toString()),
     tap((data) => console.log(data))
