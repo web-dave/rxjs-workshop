@@ -1,7 +1,21 @@
-import { fromEvent, map, pairwise, take, tap } from 'rxjs';
+import {
+  Observable,
+  concatMap,
+  debounceTime,
+  exhaustMap,
+  fromEvent,
+  map,
+  mergeMap,
+  pairwise,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
+import { ajax } from 'rxjs/ajax';
 
 const btn = document.querySelector('button');
-const output: HTMLUListElement = document.querySelector('ul');
+const input = document.querySelector('input');
+const output = document.querySelector('ul');
 
 function print(text: string) {
   const li: HTMLLIElement = document.createElement('li');
@@ -9,6 +23,26 @@ function print(text: string) {
   output.appendChild(li);
 }
 // coding start here
+
+const input$ = fromEvent(input, 'input');
+const searchStr$: Observable<string> = input$.pipe(
+  map((data) => (data.target as HTMLInputElement).value)
+);
+
+searchStr$
+  .pipe(
+    // debounceTime(300),
+    switchMap((data) =>
+      ajax<any[]>('http://localhost:3000/users?first_name_like=' + data)
+    )
+  )
+  .subscribe({
+    next: (result) => {
+      console.log(result);
+      output.innerHTML = '';
+      result.response.forEach((user) => print(user.first_name));
+    },
+  });
 
 const buttonObservable$ = fromEvent(btn, 'click');
 
