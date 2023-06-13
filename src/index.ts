@@ -8,19 +8,30 @@ function print(text: string) {
   li.innerText = text;
   output.appendChild(li);
 }
-
 // coding start here
 const myObservable = {
   observer: null,
   subscribe: function (obs) {
-    myObservable.observer = obs;
-
-    setInterval(() => {
-      myObservable.observer.next('Hallo');
+    this.observer = obs;
+    ///////// Producer ///////
+    const i = setInterval(() => {
+      this.observer.next('Hallo');
     }, 2000);
+    ///////
+    return function unsubscribe() {
+      clearInterval(i);
+    };
+  },
+  foo: () => {
+    console.log(this);
+    myObservable.observer.next('FOOO');
   },
 };
 
-myObservable.subscribe({
+const sub = myObservable.subscribe({
   next: (data) => console.log(data),
 });
+myObservable.foo();
+setTimeout(() => {
+  sub();
+}, 4500);
