@@ -31,7 +31,9 @@ const myObservable = {
 const sub = myObservable.subscribe({
   next: (data) => console.log(data),
 });
-myObservable.foo();
+
 setTimeout(() => {
   sub();
 }, 4500);
+
+myObservable.foo();
