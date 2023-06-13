@@ -7,6 +7,7 @@ import {
   map,
   mergeMap,
   pairwise,
+  pipe,
   switchMap,
   take,
   tap,
@@ -47,25 +48,21 @@ searchStr$
 const buttonObservable$ = fromEvent(btn, 'click');
 
 // buttonObservable$.subscribe();
-
-const sub = buttonObservable$
-  .pipe(
+function myOperator() {
+  return pipe(
     take(7),
-    tap((data) => console.log(data)),
-    map((data) => data.timeStamp),
+    map((data: Event) => data.timeStamp),
     pairwise(),
-    tap((data) => console.log(data)),
-    map((data) => data[1] - data[0]),
-    tap((data) => console.log(data)),
-    map((hurz) => hurz.toString()),
-    tap((data) => console.log(data))
-  )
-  .subscribe({
-    next: (data) => {
-      print(data);
-    },
-    complete: () => print('Ich habe fertig'),
-  });
+    map((data: [number, number]) => data[1] - data[0]),
+    map((hurz) => hurz.toString())
+  );
+}
+const sub = buttonObservable$.pipe(myOperator()).subscribe({
+  next: (data) => {
+    print(data);
+  },
+  complete: () => print('Ich habe fertig'),
+});
 setInterval(() => {
   console.log(sub.closed);
 }, 1500);
