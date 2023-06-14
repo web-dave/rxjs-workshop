@@ -81,7 +81,7 @@ searchStr$
 const buttonObservable$ = fromEvent(btn, 'click');
 
 // buttonObservable$.subscribe();
-function myOperator() {
+export function myOperator() {
   return pipe(
     take(7),
     map((data: Event) => data.timeStamp),
@@ -90,6 +90,9 @@ function myOperator() {
     map((hurz) => hurz.toString())
   );
 }
+// -abc-
+// --de
+
 const sub = buttonObservable$.pipe(myOperator()).subscribe({
   next: (data) => {
     print(data);

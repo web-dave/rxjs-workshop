@@ -1,5 +1,16 @@
-import { of, map } from 'rxjs';
+import { of, map, from, pairwise, pipe, take } from 'rxjs';
 import { cold } from 'jasmine-marbles';
+
+export function myOperator() {
+  return pipe(
+    take(7),
+    map((data: Event) => data.timeStamp),
+    pairwise(),
+    map((data: [number, number]) => data[1] - data[0]),
+    map((hurz) => hurz.toString())
+  );
+}
+
 const mockData = [
   {
     id: 1,
@@ -45,5 +56,47 @@ describe('mapArrayMap', () => {
     const actual = of([5, 4, 3, 2, 1]).pipe(map((data) => data.sort()));
     const expected = cold('(a|)', { a: [1, 2, 3, 4, 5] });
     expect(actual).toBeObservable(expected);
+  });
+});
+
+const inputDataStream = {
+  a: {
+    timeStamp: 10000,
+  },
+  b: {
+    timeStamp: 10200,
+  },
+  c: {
+    timeStamp: 13000,
+  },
+  d: {
+    timeStamp: 20030,
+  },
+  e: {
+    timeStamp: 40000,
+  },
+  f: {
+    timeStamp: 50500,
+  },
+  g: {
+    timeStamp: 55000,
+  },
+  h: {
+    timeStamp: 55600,
+  },
+};
+
+describe('myOperator', () => {
+  it('should calc the time diff', () => {
+    const input$ = cold('--abcdefgh---', inputDataStream).pipe(myOperator());
+    const output$ = cold('---abcde(f|)', {
+      a: '200',
+      b: '2800',
+      c: '7030',
+      d: '19970',
+      e: '10500',
+      f: '4500',
+    });
+    expect(input$).toBeObservable(output$);
   });
 });
