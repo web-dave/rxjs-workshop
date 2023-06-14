@@ -31,6 +31,15 @@ function print(text: string) {
 }
 // coding start here
 
+const msgBuzz = new BehaviorSubject<string>('');
+const inputMsg = document.querySelector('.msg');
+const msg$ = fromEvent(inputMsg, 'blur').pipe(
+  map((data) => (data.target as HTMLInputElement).value)
+);
+msg$.subscribe({ next: (data) => msgBuzz.next(data.toUpperCase()) });
+
+msgBuzz.subscribe((data) => print(data));
+
 // const ws = new WebSocketSubject(
 //   'wss://demo.piesocket.com/v3/channel_123?api_key=VCXCEuvhGcBDP7XhiJJUDvR1e1D3eiVjgZ9VRiaV&notify_self'
 // );
@@ -42,20 +51,11 @@ const searchStr$: Observable<string> = input$.pipe(
   map((data) => (data.target as HTMLInputElement).value)
 );
 
-const msgBuzz = new BehaviorSubject<string>('');
-const inputMsg = document.querySelector('.msg');
-const msg$ = fromEvent(inputMsg, 'blur').pipe(
-  map((data) => (data.target as HTMLInputElement).value)
-);
-msg$.subscribe({ next: (data) => msgBuzz.next(data.toLowerCase()) });
-
-msgBuzz.subscribe((data) => print(data));
-
 searchStr$
   .pipe(
     // debounceTime(300),
     switchMap((data) =>
-      ajax<any[]>('http://localhost:3000/user?first_name_like=' + data).pipe(
+      ajax<any[]>('http://localhost:3000/users?first_name_like=' + data).pipe(
         retry({ delay: 1500, count: 2, resetOnSuccess: true }),
         catchError((err) => {
           console.error(err);
