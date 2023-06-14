@@ -15,12 +15,15 @@ import {
   take,
   tap,
   BehaviorSubject,
+  timer,
+  takeUntil,
 } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 
 import { WebSocketSubject } from 'rxjs/webSocket';
 
 const btn = document.querySelector('button');
+const terminator$ = fromEvent(document.querySelector('.terminator'), 'click');
 const input = document.querySelector('input');
 const output = document.querySelector('ul');
 
@@ -38,7 +41,7 @@ const msg$ = fromEvent(inputMsg, 'blur').pipe(
 );
 msg$.subscribe({ next: (data) => msgBuzz$$.next(data.toUpperCase()) });
 
-// msgBuzz$$.subscribe(msgBuzz$$);
+const foo$ = msgBuzz$$.asObservable();
 
 msgBuzz$$.subscribe((data) => print(data));
 msgBuzz$$.subscribe((data) => console.info(data));
@@ -96,6 +99,12 @@ const sub = buttonObservable$.pipe(myOperator()).subscribe({
 setInterval(() => {
   console.log(sub.closed);
 }, 1500);
+
+timer(1, 2000)
+  .pipe(takeUntil(terminator$))
+  .subscribe({
+    next: (data) => console.log(data),
+  });
 // buttonObservable$.subscribe((data) => console.log(data));
 
 // const myObservable = {
