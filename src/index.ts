@@ -31,14 +31,17 @@ function print(text: string) {
 }
 // coding start here
 
-const msgBuzz = new BehaviorSubject<string>('');
+const msgBuzz$$ = new BehaviorSubject<string>('Täch');
 const inputMsg = document.querySelector('.msg');
 const msg$ = fromEvent(inputMsg, 'blur').pipe(
   map((data) => (data.target as HTMLInputElement).value)
 );
-msg$.subscribe({ next: (data) => msgBuzz.next(data.toUpperCase()) });
+msg$.subscribe({ next: (data) => msgBuzz$$.next(data.toUpperCase()) });
 
-msgBuzz.subscribe((data) => print(data));
+// msgBuzz$$.subscribe(msgBuzz$$);
+
+msgBuzz$$.subscribe((data) => print(data));
+msgBuzz$$.subscribe((data) => console.info(data));
 
 // const ws = new WebSocketSubject(
 //   'wss://demo.piesocket.com/v3/channel_123?api_key=VCXCEuvhGcBDP7XhiJJUDvR1e1D3eiVjgZ9VRiaV&notify_self'
