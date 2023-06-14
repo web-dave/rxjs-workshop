@@ -14,8 +14,11 @@ import {
   switchMap,
   take,
   tap,
+  BehaviorSubject,
 } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
+
+import { WebSocketSubject } from 'rxjs/webSocket';
 
 const btn = document.querySelector('button');
 const input = document.querySelector('input');
@@ -28,10 +31,25 @@ function print(text: string) {
 }
 // coding start here
 
+// const ws = new WebSocketSubject(
+//   'wss://demo.piesocket.com/v3/channel_123?api_key=VCXCEuvhGcBDP7XhiJJUDvR1e1D3eiVjgZ9VRiaV&notify_self'
+// );
+// ws.subscribe((data) => console.log(data));
+// ws.next('Hi!');
+
 const input$ = fromEvent(input, 'input');
 const searchStr$: Observable<string> = input$.pipe(
   map((data) => (data.target as HTMLInputElement).value)
 );
+
+const msgBuzz = new BehaviorSubject<string>('');
+const inputMsg = document.querySelector('.msg');
+const msg$ = fromEvent(inputMsg, 'blur').pipe(
+  map((data) => (data.target as HTMLInputElement).value)
+);
+msg$.subscribe({ next: (data) => msgBuzz.next(data.toLowerCase()) });
+
+msgBuzz.subscribe((data) => print(data));
 
 searchStr$
   .pipe(
