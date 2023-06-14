@@ -1,13 +1,16 @@
 import {
   Observable,
+  catchError,
   concatMap,
   debounceTime,
   exhaustMap,
   fromEvent,
   map,
   mergeMap,
+  of,
   pairwise,
   pipe,
+  retry,
   switchMap,
   take,
   tap,
@@ -34,7 +37,13 @@ searchStr$
   .pipe(
     // debounceTime(300),
     switchMap((data) =>
-      ajax<any[]>('http://localhost:3000/users?first_name_like=' + data)
+      ajax<any[]>('http://localhost:3000/user?first_name_like=' + data).pipe(
+        retry({ delay: 1500, count: 2, resetOnSuccess: true }),
+        catchError((err) => {
+          console.error(err);
+          return of({ response: [] });
+        })
+      )
     )
   )
   .subscribe({
