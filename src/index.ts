@@ -1,4 +1,4 @@
-import { Observer, fromEvent } from 'rxjs';
+import { Observable, Observer, fromEvent } from 'rxjs';
 
 const btn = document.querySelector('button');
 const output: HTMLUListElement = document.querySelector('ul');
@@ -11,7 +11,7 @@ function print(text: string) {
 
 // coding start here
 
-const obs = fromEvent(btn, 'click');
+const obs$ = fromEvent(btn, 'click');
 
 // const obs = {
 //   observer: null,
@@ -24,8 +24,13 @@ const obs = fromEvent(btn, 'click');
 //   },
 // };
 
-obs.subscribe({
+obs$.subscribe({
   next: (data) => print('Tach, Moin, Hallo, Servus'),
 });
 
 // obs.next('Hallo');
+
+// function myOperator<T>(op: Observable<T>): Observable<T>{
+// fn
+// return op
+// }
