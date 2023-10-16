@@ -1,4 +1,13 @@
-import { Observable, Observer, fromEvent, map, tap } from 'rxjs';
+import {
+  Observable,
+  Observer,
+  fromEvent,
+  map,
+  pairwise,
+  take,
+  tap,
+  timer,
+} from 'rxjs';
 
 const btn = document.querySelector('button');
 const output: HTMLUListElement = document.querySelector('ul');
@@ -24,10 +33,20 @@ const obs$ = fromEvent(btn, 'click');
 //   },
 // };
 
+// timer(1, 1)
+//   .pipe(
+//     tap((_) => btn.click()),
+//     tap((data) => console.log(data))
+//   )
+//   .subscribe();
+
 obs$
   .pipe(
-    tap((data) => console.log(data)),
     map((data) => data.timeStamp),
+    take(7),
+    pairwise(),
+    map((data) => data[1] - data[0]),
+    // map(([acc, curr]) => curr - acc),
     map((data) => data + '')
   )
   .subscribe({
