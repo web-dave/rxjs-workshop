@@ -1,6 +1,20 @@
-import { fromEvent, interval, map, pairwise, take, takeUntil, tap } from 'rxjs';
+import {
+  concatMap,
+  exhaustMap,
+  fromEvent,
+  interval,
+  map,
+  mergeMap,
+  pairwise,
+  switchMap,
+  take,
+  takeUntil,
+  tap,
+} from 'rxjs';
+import { ajax } from 'rxjs/ajax';
 
 const btn = document.querySelector('button');
+const input = document.querySelector('input');
 const output: HTMLUListElement = document.querySelector('ul');
 
 function print(text: string) {
@@ -10,10 +24,25 @@ function print(text: string) {
 }
 // coding start here
 
+// Trigger
+const trigger$ = fromEvent(input, 'input');
+
+// Source
+const source$ = (n: string) =>
+  ajax.get('http://localhost:3000/users?last_name_like=' + n);
+
+trigger$
+  .pipe(
+    map((evt: MouseEvent) => (evt.target as HTMLInputElement).value),
+    tap((data) => console.log(data)),
+    exhaustMap((data) => source$(data)),
+    tap((data) => console.log(data))
+  )
+  .subscribe();
+
 const click$ = fromEvent(btn, 'click');
-interval(1000)
-  .pipe(takeUntil(click$))
-  .subscribe({ next: (d) => console.info(d) });
+interval(1000).pipe(takeUntil(click$));
+// .subscribe({ next: (d) => console.info(d) });
 click$
   .pipe(
     take(7),
