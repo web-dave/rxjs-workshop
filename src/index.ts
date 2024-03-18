@@ -35,10 +35,17 @@ trigger$
   .pipe(
     map((evt: MouseEvent) => (evt.target as HTMLInputElement).value),
     tap((data) => console.log(data)),
-    exhaustMap((data) => source$(data)),
+    switchMap((data) => source$(data)),
+    tap((data) => console.log(data)),
+    map((userList: any) => userList.response.map((u) => u.last_name)),
     tap((data) => console.log(data))
   )
-  .subscribe();
+  .subscribe({
+    next: (users) => {
+      output.innerHTML = '';
+      users.forEach((u) => print(u));
+    },
+  });
 
 const click$ = fromEvent(btn, 'click');
 interval(1000).pipe(takeUntil(click$));
