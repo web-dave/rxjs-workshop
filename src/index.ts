@@ -1,19 +1,28 @@
 import {
+  BehaviorSubject,
+  ReplaySubject,
+  catchError,
   concatMap,
   exhaustMap,
   fromEvent,
   interval,
   map,
   mergeMap,
+  of,
   pairwise,
   pipe,
+  retry,
   switchMap,
   take,
   takeUntil,
   tap,
 } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
+import { eyeColor, IUser } from './eye-color.pipe';
+import { timeDiff } from './time-diff.pipe';
 
+const msg = document.querySelector('.msg');
+const text = document.querySelector('textarea');
 const btn = document.querySelector('button');
 const input = document.querySelector('input');
 const output: HTMLUListElement = document.querySelector('ul');
@@ -24,31 +33,59 @@ function print(text: string) {
   output.appendChild(li);
 }
 // coding start here
+const msgBuzz$$ = new ReplaySubject<string>(1);
+
+const text$ = fromEvent(text, 'blur');
+text$
+  .pipe(map((evt: MouseEvent) => (evt.target as HTMLTextAreaElement).value))
+  .subscribe({
+    next: (data) => {
+      msgBuzz$$.next(data);
+      text.value = '';
+    },
+  });
+
+msgBuzz$$.subscribe({
+  next: (m) => {
+    const h5 = document.createElement('h5');
+    h5.innerText = m;
+    msg.appendChild(h5);
+    setTimeout(() => {
+      msgBuzz$$.error('Help');
+    }, 2000);
+    setTimeout(() => {
+      msgBuzz$$.subscribe({ next: (data) => console.log(data) });
+    }, 4000);
+  },
+});
 
 // Trigger
 const trigger$ = fromEvent(input, 'input');
 
-// Source
-interface IUser {
-  id: number;
-  first_name: string;
-  last_name: string;
-  email: string;
-  gender: string;
-  ip_address: string;
-  eye_color: string;
-}
-function eyeColor() {
-  return map((user: IUser) => user.eye_color);
-}
 const source$ = (n: string) =>
-  ajax.get('http://localhost:3000/users?last_name_like=' + n);
-
+  ajax.get('http://localhost:3000/users?last_name_like=' + encodeURI(n)).pipe(
+    retry({ count: 3, delay: 3000, resetOnSuccess: true }),
+    catchError((err) =>
+      of({
+        response: [
+          {
+            id: 1,
+            first_name: 'Hyuitr',
+            last_name: 'Knpftre',
+            email: 'd;flgkj',
+            gender: '',
+            ip_address: '',
+            eye_color: 'hotpink',
+          },
+        ],
+      })
+    )
+  );
 trigger$
   .pipe(
     map((evt: MouseEvent) => (evt.target as HTMLInputElement).value),
-    tap((data) => console.log(data)),
     switchMap((data) => source$(data)),
+
     tap((data) => console.log(data)),
     map((userList: any) => userList.response),
     tap((data: IUser[]) => console.log(data)),
@@ -62,18 +99,6 @@ trigger$
       // users.forEach((u) => print(u));
     },
   });
-
-function timeDiff() {
-  return pipe(
-    tap((data) => console.log(data)),
-    map((evt: MouseEvent) => evt.timeStamp),
-    tap((data) => console.log(data)),
-    pairwise(),
-    tap((data) => console.log(data)),
-    map(([prev, click]) => click - prev),
-    tap((data) => console.log(data))
-  );
-}
 
 const click$ = fromEvent(btn, 'click');
 interval(1000).pipe(takeUntil(click$));
