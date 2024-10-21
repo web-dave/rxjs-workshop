@@ -1,4 +1,5 @@
 import {
+  catchError,
   concatMap,
   debounceTime,
   exhaustMap,
@@ -6,9 +7,11 @@ import {
   map,
   mergeMap,
   Observable,
+  of,
   pairwise,
   PartialObserver,
   pipe,
+  retry,
   switchMap,
   take,
   tap,
@@ -49,6 +52,17 @@ function valueDebounceOperator() {
   );
 }
 
+function errorHandlingOperator() {
+  return pipe(
+    retry({
+      delay: 3000,
+      count: 2,
+      resetOnSuccess: true,
+    }),
+    catchError((err) => of([]))
+  );
+}
+
 const input$: Observable<string> = fromEvent(input, 'input').pipe(
   valueDebounceOperator()
 );
@@ -57,7 +71,8 @@ const http$ = input$
   .pipe(
     switchMap((search) =>
       ajax('http://localhost:3000/users?first_name_like=' + search).pipe(
-        map((data) => data.response)
+        map((data) => data.response),
+        errorHandlingOperator()
       )
     ),
     tap((data) => console.log(data)),
