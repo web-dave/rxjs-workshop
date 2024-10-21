@@ -1,4 +1,11 @@
-import { fromEvent, map, Observable, PartialObserver, tap } from 'rxjs';
+import {
+  fromEvent,
+  map,
+  Observable,
+  pairwise,
+  PartialObserver,
+  tap,
+} from 'rxjs';
 
 const btn = document.querySelector('button');
 const output: HTMLUListElement = document.querySelector('ul');
@@ -12,6 +19,10 @@ function print(text: string) {
 const myObservable: Observable<string> = fromEvent(btn, 'click').pipe(
   tap((data) => console.log(data)),
   map((data) => data.timeStamp),
+  tap((data) => console.log(data)),
+  pairwise(),
+  tap((data) => console.log(data)),
+  map(([alt, neu]) => neu - alt),
   tap((data) => console.log(data)),
   map((data) => data + '')
 );
