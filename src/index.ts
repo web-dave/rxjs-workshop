@@ -4,6 +4,7 @@ import {
   Observable,
   pairwise,
   PartialObserver,
+  take,
   tap,
 } from 'rxjs';
 
@@ -19,6 +20,7 @@ function print(text: string) {
 const myObservable: Observable<string> = fromEvent(btn, 'click').pipe(
   tap((data) => console.log(data)),
   map((data) => data.timeStamp),
+  take(7),
   tap((data) => console.log(data)),
   pairwise(),
   tap((data) => console.log(data)),
