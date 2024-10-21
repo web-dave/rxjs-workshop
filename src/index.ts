@@ -88,7 +88,10 @@ const http$ = input$
       userList.map((user) => user.first_name + ', ' + user.last_name)
     )
   )
-  .subscribe((data) => data.forEach((name) => print(name)));
+  .subscribe({
+    next: (data) => data.forEach((name) => print(name)),
+    error: (err) => console.error('Ouch', err),
+  });
 
 const msg$$ = new BehaviorSubject<string>('');
 
