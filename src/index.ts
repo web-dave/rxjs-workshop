@@ -8,6 +8,7 @@ import {
   Observable,
   pairwise,
   PartialObserver,
+  pipe,
   switchMap,
   take,
   tap,
@@ -41,9 +42,15 @@ myObservable.subscribe({
   next: (data) => print(data),
 });
 
+function valueDebounceOperator() {
+  return pipe(
+    debounceTime(500),
+    map((e: Event) => (e.target as HTMLInputElement).value)
+  );
+}
+
 const input$: Observable<string> = fromEvent(input, 'input').pipe(
-  debounceTime(500),
-  map((e) => (e.target as HTMLInputElement).value)
+  valueDebounceOperator()
 );
 
 const http$ = input$
