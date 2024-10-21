@@ -1,4 +1,4 @@
-import { PartialObserver } from 'rxjs';
+import { fromEvent, PartialObserver } from 'rxjs';
 
 const btn = document.querySelector('button');
 const output: HTMLUListElement = document.querySelector('ul');
@@ -9,17 +9,8 @@ function print(text: string) {
   output.appendChild(li);
 }
 
-const myObservable = {
-  observers: [],
-  subscribe: function (observer: PartialObserver<string>) {
-    myObservable.observers.push(observer);
-    setTimeout(
-      () => myObservable.observers.forEach((o) => o.next('Hallo')),
-      1500
-    );
-  },
-};
+const myObservable = fromEvent(btn, 'click');
 
 myObservable.subscribe({
-  next: (data) => console.log(data),
+  next: (data) => print('Hallo'),
 });
