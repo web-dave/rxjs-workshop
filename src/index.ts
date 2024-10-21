@@ -1,4 +1,5 @@
 import {
+  BehaviorSubject,
   catchError,
   concatMap,
   debounceTime,
@@ -12,6 +13,7 @@ import {
   PartialObserver,
   pipe,
   retry,
+  scan,
   switchMap,
   take,
   tap,
@@ -38,7 +40,11 @@ const myObservable: Observable<string> = fromEvent(btn, 'click').pipe(
   tap((data) => console.log(data)),
   map(([alt, neu]) => neu - alt),
   tap((data) => console.log(data)),
-  map((data) => data + '')
+  // tap((time) => filter$$.next({ time })),
+  map((data: number) => {
+    filter$$.next({ time: data });
+    return data + '';
+  })
 );
 
 myObservable.subscribe({
@@ -64,7 +70,9 @@ function errorHandlingOperator() {
 }
 
 const input$: Observable<string> = fromEvent(input, 'input').pipe(
-  valueDebounceOperator()
+  valueDebounceOperator(),
+  tap((text) => msg$$.next(text)),
+  tap((text) => filter$$.next({ text }))
 );
 
 const http$ = input$
@@ -81,3 +89,20 @@ const http$ = input$
     )
   )
   .subscribe((data) => data.forEach((name) => print(name)));
+
+const msg$$ = new BehaviorSubject<string>('');
+
+msg$$.subscribe((data) => console.log('msg', data));
+
+const filter$$ = new BehaviorSubject<{ time?: number; text?: string }>({
+  time: 0,
+  text: '',
+});
+
+const allFilters$ = filter$$.pipe(
+  scan((next, prev) => {
+    return { ...next, ...prev };
+  })
+);
+
+allFilters$.subscribe((data) => console.log(data));
