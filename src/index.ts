@@ -10,3 +10,27 @@ function print(text: string) {
 }
 
 // coding start here
+const myObserable = {
+  observer: null,
+  subscribe: function (observer) {
+    myObserable.observer = observer;
+    setTimeout(() => myObserable.next('Hallo'), 1500);
+  },
+  next: function (value) {
+    myObserable.observer?.next(value);
+  },
+  error: function (err) {
+    myObserable.observer.error(err);
+    myObserable.observer = null;
+  },
+  complete: function () {
+    myObserable.observer.complete();
+    myObserable.observer = null;
+  },
+};
+
+myObserable.subscribe({
+  next: (data) => console.log(data),
+  error: (err) => console.error(err),
+  complete: () => console.log('Complete'),
+});
