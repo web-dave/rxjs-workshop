@@ -1,6 +1,22 @@
-import { fromEvent, map, of, pairwise, tap } from 'rxjs';
+import {
+  concatMap,
+  debounceTime,
+  exhaustMap,
+  from,
+  fromEvent,
+  map,
+  mergeMap,
+  of,
+  pairwise,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
+import { ajax } from 'rxjs/ajax';
+import { fromFetch } from 'rxjs/fetch';
 
 const btn = document.querySelector('button');
+const searchInput = document.querySelector('input');
 const output: HTMLUListElement = document.querySelector('ul');
 
 function print(text: string) {
@@ -42,11 +58,40 @@ const button$ = fromEvent(btn, 'click');
 
 button$
   .pipe(
+    take(7),
     map((data) => data.timeStamp),
+    tap((data) => console.log(data)),
     pairwise(),
-    map(([prev, curr]) => curr - prev),
-    tap((data) => console.log(data))
+    map(([prev, curr]) => curr - prev)
   )
   .subscribe({
     next: (data) => print(data + ''),
+  });
+
+const search$ = fromEvent(searchInput, 'input').pipe(
+  debounceTime(300),
+  map((event) => (event.target as HTMLInputElement).value)
+);
+
+search$
+  .pipe(
+    switchMap((serchTerm) =>
+      // ajax({
+      //   method: 'GET',
+      //   url: 'http://localhost:3000/users?last_name_like=' + serchTerm,
+      //   responseType: 'json',
+      // }).pipe(map((responseObj) => responseObj.response))
+      fromFetch('http://localhost:3000/users?last_name_like=' + serchTerm).pipe(
+        switchMap((response) => response.json()),
+        tap((data) => console.log(data))
+        // map((responseObj) => responseObj.response)
+      )
+    ),
+    map((userList: any[]) => userList.map((user) => user.last_name))
+  )
+  .subscribe({
+    next: (data) => {
+      output.innerHTML = '';
+      data.forEach((name) => print(name));
+    },
   });
