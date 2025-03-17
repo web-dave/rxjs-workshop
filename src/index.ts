@@ -1,4 +1,5 @@
 import {
+  BehaviorSubject,
   catchError,
   concatMap,
   debounceTime,
@@ -11,6 +12,7 @@ import {
   of,
   pairwise,
   pipe,
+  ReplaySubject,
   retry,
   switchMap,
   take,
@@ -20,9 +22,16 @@ import {
 import { ajax } from 'rxjs/ajax';
 import { fromFetch } from 'rxjs/fetch';
 
-const btn = document.querySelector('button');
+const btn = document.querySelector('button.one');
+const btn2 = document.querySelector('button.two');
 const searchInput = document.querySelector('input');
 const output: HTMLUListElement = document.querySelector('ul');
+
+btn2.addEventListener('click', () => {
+  msgBuzz$$.subscribe({
+    next: (data) => console.log('MSG', data),
+  });
+});
 
 const online$ = timer(100, 1000).pipe(
   map(() => window.navigator.onLine),
@@ -77,6 +86,8 @@ const limitDiffOperator = (limit: number) => {
   );
 };
 
+const msgBuzz$$ = new ReplaySubject(8);
+
 button$
   .pipe(
     limitDiffOperator(7)
@@ -87,7 +98,10 @@ button$
     // map(([prev, curr]) => curr - prev)
   )
   .subscribe({
-    next: (data) => print(data + ''),
+    next: (data) => {
+      msgBuzz$$.next(data);
+      print(data + '');
+    },
   });
 
 const search$ = fromEvent(searchInput, 'input').pipe(
