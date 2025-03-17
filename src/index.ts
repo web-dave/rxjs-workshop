@@ -1,7 +1,9 @@
 import {
+  catchError,
   concatMap,
   debounceTime,
   exhaustMap,
+  filter,
   from,
   fromEvent,
   map,
@@ -9,9 +11,11 @@ import {
   of,
   pairwise,
   pipe,
+  retry,
   switchMap,
   take,
   tap,
+  timer,
 } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 import { fromFetch } from 'rxjs/fetch';
@@ -19,6 +23,12 @@ import { fromFetch } from 'rxjs/fetch';
 const btn = document.querySelector('button');
 const searchInput = document.querySelector('input');
 const output: HTMLUListElement = document.querySelector('ul');
+
+const online$ = timer(100, 1000).pipe(
+  map(() => window.navigator.onLine),
+  filter((online) => online)
+);
+// .subscribe((data) => console.log('online', data));
 
 function print(text: string) {
   const li: HTMLLIElement = document.createElement('li');
@@ -94,9 +104,14 @@ search$
       //   responseType: 'json',
       // }).pipe(map((responseObj) => responseObj.response))
       fromFetch('http://localhost:3000/users?last_name_like=' + serchTerm).pipe(
+        retry({
+          delay: (c) => online$,
+          count: 3,
+          resetOnSuccess: true,
+        }),
         switchMap((response) => response.json()),
+        catchError(() => of([])),
         tap((data) => console.log(data))
-        // map((responseObj) => responseObj.response)
       )
     ),
     map((userList: any[]) => userList.map((user) => user.last_name))
