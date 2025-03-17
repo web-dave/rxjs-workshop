@@ -21,6 +21,7 @@ import {
 } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 import { fromFetch } from 'rxjs/fetch';
+import { limitDiffOperator } from './custom.pipe';
 
 const btn = document.querySelector('button.one');
 const btn2 = document.querySelector('button.two');
@@ -75,16 +76,6 @@ myObserable.subscribe({
 // )
 
 const button$ = fromEvent(btn, 'click');
-
-const limitDiffOperator = (limit: number) => {
-  return pipe(
-    take(limit),
-    map((data: Event) => data.timeStamp),
-    tap((data) => console.log(data)),
-    pairwise(),
-    map(([prev, curr]) => curr - prev)
-  );
-};
 
 const msgBuzz$$ = new ReplaySubject(8);
 
