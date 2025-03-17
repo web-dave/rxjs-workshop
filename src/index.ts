@@ -8,6 +8,7 @@ import {
   mergeMap,
   of,
   pairwise,
+  pipe,
   switchMap,
   take,
   tap,
@@ -56,13 +57,24 @@ myObserable.subscribe({
 
 const button$ = fromEvent(btn, 'click');
 
-button$
-  .pipe(
-    take(7),
-    map((data) => data.timeStamp),
+const limitDiffOperator = (limit: number) => {
+  return pipe(
+    take(limit),
+    map((data: Event) => data.timeStamp),
     tap((data) => console.log(data)),
     pairwise(),
     map(([prev, curr]) => curr - prev)
+  );
+};
+
+button$
+  .pipe(
+    limitDiffOperator(7)
+    // take(7),
+    // map((data) => data.timeStamp),
+    // tap((data) => console.log(data)),
+    // pairwise(),
+    // map(([prev, curr]) => curr - prev)
   )
   .subscribe({
     next: (data) => print(data + ''),
