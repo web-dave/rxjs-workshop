@@ -1,11 +1,15 @@
 import {
+  catchError,
   concatMap,
   debounceTime,
+  filter,
   fromEvent,
   map,
   mergeMap,
+  of,
   pairwise,
   pipe,
+  retry,
   switchMap,
   take,
   tap,
@@ -43,10 +47,15 @@ search$
     map((evt) => input.value),
     debounceTime(300),
     switchMap((searchTerm) =>
-      ajax.getJSON<{ [key: string]: string }[]>(
-        `http://localhost:3000/users?q=${searchTerm}`
-      )
+      ajax
+        .getJSON<{ [key: string]: string }[]>(
+          `http://localhost:3000/users?q=${searchTerm}`
+        )
+        .pipe(retry({ count: 3, delay: 3000, resetOnSuccess: true }))
     ),
+    // retry({ count: 3, delay: 3000, resetOnSuccess: true }),
+    catchError((err) => of([{ first_name: false }])),
+    filter((list) => list.length == 0 || !!list[0].first_name),
     transformResponseToList(['first_name', 'last_name']),
     // map((data) => data.response),
     // map((users: any[]) => users.map((u) => `${u.first_name}, ${u.last_name}`)),
