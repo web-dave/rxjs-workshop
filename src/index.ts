@@ -5,11 +5,12 @@ import {
   map,
   mergeMap,
   pairwise,
+  pipe,
   switchMap,
   take,
   tap,
 } from 'rxjs';
-import { ajax } from 'rxjs/ajax';
+import { ajax, AjaxResponse } from 'rxjs/ajax';
 
 const btn = document.querySelector('button');
 const input = document.querySelector('input');
@@ -27,15 +28,28 @@ const search$ = fromEvent(input, 'input');
 
 search$.pipe(map((evt) => (evt.target as HTMLInputElement).value));
 
+// interface Iuser
+
+function transformResponseToList(keys: string[]) {
+  return pipe(
+    map((users: { [key: string]: string }[]) =>
+      users.map((u) => keys.map((key) => u[key]).join(','))
+    )
+  );
+}
+
 search$
   .pipe(
     map((evt) => input.value),
     debounceTime(300),
     switchMap((searchTerm) =>
-      ajax(`http://localhost:3000/users?q=${searchTerm}`)
+      ajax.getJSON<{ [key: string]: string }[]>(
+        `http://localhost:3000/users?q=${searchTerm}`
+      )
     ),
-    map((data) => data.response),
-    map((users: any[]) => users.map((u) => `${u.first_name}, ${u.last_name}`)),
+    transformResponseToList(['first_name', 'last_name']),
+    // map((data) => data.response),
+    // map((users: any[]) => users.map((u) => `${u.first_name}, ${u.last_name}`)),
     tap(() => (output.innerHTML = ''))
   )
   .subscribe({
