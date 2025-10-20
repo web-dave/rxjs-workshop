@@ -15,6 +15,7 @@ import {
   tap,
 } from 'rxjs';
 import { ajax, AjaxResponse } from 'rxjs/ajax';
+// import { WebSocketSubject } from 'rxjs/webSocket';
 
 const btn = document.querySelector('button');
 const input = document.querySelector('input');
@@ -85,13 +86,19 @@ const sub = button$
     },
   });
 
-// const observable = {
-//   listener: null,
-//   subscribe: (observer) => (observable.listener = observer),
-//   next: (value) => observable.listener.next(value),
-// };
+const observable = {
+  listener: null,
+  subscribe: async (observer) => {
+    observable.listener = observer;
 
-// observable.subscribe({ next: (data) => console.log('===>', data) });
+    const res = await fetch('http://localhost:3000/users?q=hal');
+    observable.next(res);
+  },
+  next: (value) => observable.listener.next(value),
+};
+
+observable.subscribe({ next: (data) => console.log('1===>', data) });
+observable.subscribe({ next: (data) => console.log('2===>', data) });
 
 // setTimeout(() => observable.next('Hallo'), 2000);
 
