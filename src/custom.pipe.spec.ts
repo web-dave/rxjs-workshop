@@ -1,8 +1,8 @@
-import { of, map } from 'rxjs';
+import { of, map, pipe } from 'rxjs';
 import { cold } from 'jasmine-marbles';
 const mockData = [
   {
-    id: 1,
+    id: '1',
     first_name: 'Arlina',
     last_name: 'Gorringe',
     email: 'agorringe0@globo.com',
@@ -11,7 +11,7 @@ const mockData = [
     eye_color: 'Teal',
   },
   {
-    id: 2,
+    id: '2',
     first_name: 'Anselma',
     last_name: 'Streatley',
     email: 'astreatley1@wired.com',
@@ -20,7 +20,7 @@ const mockData = [
     eye_color: 'Indigo',
   },
   {
-    id: 3,
+    id: '3',
     first_name: 'Munroe',
     last_name: 'Demkowicz',
     email: 'mdemkowicz2@surveymonkey.com',
@@ -29,7 +29,7 @@ const mockData = [
     eye_color: 'Pink',
   },
   {
-    id: 4,
+    id: '4',
     first_name: 'Jobey',
     last_name: 'Lorinez',
     email: 'jlorinez3@google.co.uk',
@@ -38,6 +38,22 @@ const mockData = [
     eye_color: 'Violet',
   },
 ];
+const mockResult = ['Arlina', 'Anselma', 'Munroe', 'Jobey'];
+
+function transformResponseToList(keys: string[]) {
+  return pipe(
+    map((users: { [key: string]: string }[]) =>
+      users.map((u) => keys.map((key) => u[key]).join(','))
+    )
+  );
+}
+describe('transformResponseToList', () => {
+  it('should transform a list of User into a list or Names', () => {
+    const actual = of(mockData).pipe(transformResponseToList(['first_name']));
+    const expected = cold('(a|)', { a: mockResult });
+    expect(actual).toBeObservable(expected);
+  });
+});
 
 // Hint
 describe('mapArrayMap', () => {
