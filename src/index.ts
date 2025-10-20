@@ -1,4 +1,4 @@
-import { fromEvent, map, pairwise, tap } from 'rxjs';
+import { fromEvent, map, pairwise, take, tap } from 'rxjs';
 
 const btn = document.querySelector('button');
 const output: HTMLUListElement = document.querySelector('ul');
@@ -11,8 +11,9 @@ function print(text: string) {
 
 const button$ = fromEvent(btn, 'click');
 
-button$
+const sub = button$
   .pipe(
+    take(7),
     tap((data) => console.log(data)),
     map((data) => data.timeStamp),
     pairwise(),
@@ -22,6 +23,9 @@ button$
   .subscribe({
     next(value) {
       print(value);
+    },
+    complete() {
+      console.log('Tschö', sub);
     },
   });
 
