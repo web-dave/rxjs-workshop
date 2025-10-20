@@ -1,6 +1,18 @@
-import { fromEvent, map, pairwise, take, tap } from 'rxjs';
+import {
+  concatMap,
+  debounceTime,
+  fromEvent,
+  map,
+  mergeMap,
+  pairwise,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
+import { ajax } from 'rxjs/ajax';
 
 const btn = document.querySelector('button');
+const input = document.querySelector('input');
 const output: HTMLUListElement = document.querySelector('ul');
 
 function print(text: string) {
@@ -10,6 +22,27 @@ function print(text: string) {
 }
 
 const button$ = fromEvent(btn, 'click');
+
+const search$ = fromEvent(input, 'input');
+
+search$.pipe(map((evt) => (evt.target as HTMLInputElement).value));
+
+search$
+  .pipe(
+    map((evt) => input.value),
+    debounceTime(300),
+    switchMap((searchTerm) =>
+      ajax(`http://localhost:3000/users?q=${searchTerm}`)
+    ),
+    map((data) => data.response),
+    map((users: any[]) => users.map((u) => `${u.first_name}, ${u.last_name}`)),
+    tap(() => (output.innerHTML = ''))
+  )
+  .subscribe({
+    next(names: string[]) {
+      names.forEach((name) => print(name));
+    },
+  });
 
 const sub = button$
   .pipe(
